@@ -80,7 +80,7 @@ l_simulacion =np.arange(0,puntos_simulacion,1)
 x_posicion = L*np.sin(theta)
 y_posicion = -L*np.cos(theta)
 
-
+"""
 for punto in l_simulacion:
     plt.figure()
     plt.plot(x_posicion[punto],y_posicion[punto],'ro',markersize = 10) #Dibuja pendulo
@@ -96,3 +96,4 @@ for punto in l_simulacion:
     plt.close()
 
 os.system("ffmpeg -f image2 -r 20 -i image%05d.png -vcodec mpeg4 -y movie.avi")
+"""

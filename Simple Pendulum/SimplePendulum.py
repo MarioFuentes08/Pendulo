@@ -66,6 +66,7 @@ plt.legend()
 plt.show()
 
 #plt.plot(t, theta,"ro", label = "Desplazamiento angular (rad)")
+
 #Simulación
 puntos_simulacion = len(t)
 l_simulacion =np.arange(0,puntos_simulacion,1)

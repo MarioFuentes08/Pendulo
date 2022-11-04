@@ -8,22 +8,114 @@ from tkinter import *
 import math
 import numpy as np
 import scipy
-from scipy.integrate import solve_ivp
+from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 import os
 
 """
 ###################################################################################
+FUNCION PARA SIMULAR
+###################################################################################
+
+"""
+
+
+
+"""
+###################################################################################
+FUNCION PARA GRAFICAR
+###################################################################################
+
+"""
+def graficar(t,theta_Graficar, omega_Graficar, titulo):
+    
+    plt.plot(t, theta_Graficar, label = "Desplazamiento angular (rad)")
+    plt.plot(t, omega_Graficar, label = "Velocidad angular (rad/s)")
+    plt.title(titulo)
+    plt.xlabel("Tiempo (s)")
+    plt.ylabel("Desp. Angular (rad) y Vel. Angular (rad/s)")
+    plt.legend()
+    plt.show()
+
+
+
+"""
+###################################################################################
 FUNCIONES PARA RESOLVER ECUACIONES DIFERENCIALES
 ###################################################################################
+
 """
-def sim_pen_eq(t,theta_S):
-    g_S = float(gravedadS_string.get())        # Acceleration due to gravity (m/s^2)
-    L_S = float(largoS_string.get())           # Length of pendulum (m)
-    dtheta2_dt_S = + (-g_S/L_S)*np.sin(theta_S[0])
-    dtheta1_dt_S = theta_S[1]
-       
-    return [dtheta1_dt_S, dtheta2_dt_S]   
+"""
+Ecuacion diferencial
+
+d2Theta/dt2 + (g/L)*senTheta = 0
+
+Reescribir en dos ecuaciones lineales de primer orden
+
+dTheta/dt = omega 
+
+domega/dt = -(g/L)senTheta
+
+"""
+def ecPenduloSimple(y_S,t):
+    theta_S, omega_S = y_S
+    g_S = float(gravedadS_string.get())
+    L_S = float(largoS_string.get())
+    
+    return [omega_S, (-g_S/L_S)*np.sin(theta_S)]  # [dtheta/dt, domega/dt]
+
+    
+"""
+Ecuacion diferencial
+
+d2Theta/dt2 + (b/m)*dTheta/dt + (g/L)*senTheta = 0
+
+Reescribir en dos ecuaciones lineales de primer orden
+
+dTheta/dt = omega 
+
+domega/dt = -(b/m)*dTheta/dt -(g/L)senTheta
+
+"""
+
+
+def ecPenduloAmortiguado(y_A,t):
+    theta_A, omega_A = y_A
+    g_A = float(gravedadA_string.get())
+    L_A = float(largoA_string.get())
+    b_A = float(amortiguamientoA_string.get())
+    m_A = float(masaA_string.get())
+    
+    return [omega_A, (-b_A/m_A)*omega_A + (-g_A/L_A)*np.sin(theta_A)]  # [dtheta/dt, domega/dt]
+
+
+"""
+Ecuacion diferencial
+
+d2Theta/dt2 + (b/m)*dTheta/dt + (g/L)*senTheta = Asen(wt)
+d2Theta/dt2 + (g/L)*senTheta - Asen(wt)= 0
+
+Reescribir en dos ecuaciones lineales de primer orden
+
+dTheta/dt = omega 
+
+domega/dt = -(b/m)*dTheta/dt -(g/L)senTheta + Asen(wt)
+
+"""
+
+
+def ecPenduloForzadoAmortiguado(y_FA,t):
+    theta_FA, omega_FA = y_FA
+    b_FA = float(amortiguamientoFA_string.get())
+    m_FA = float(masaFA_string.get())
+    g_FA = float(gravedadFA_string.get())
+    L_FA = float(largoFA_string.get())
+    A_fuerza = float(amplitudFuerzaFA_string.get())
+    w_fuerza = float(frecuenciaFA_string.get())
+    
+    return [omega_FA, ( ((-b_FA/m_FA)*omega_FA) + (-g_FA/L_FA)*np.sin(theta_FA) + (A_fuerza*np.sin(w_fuerza*t)) )]  # [dtheta/dt, domega/dt]
+
+
 
 """
 ###################################################################################
@@ -36,48 +128,61 @@ FUNCIONES PARA LLAMAR
      dtheta2_dt is angular acceleration at current time instant
      dtheta1_dt is rate of change of angular displacement at current time instant i.e. same as theta2 
 """
+
 def penduloSimple():
-    theta1_ini_Simple = float(amplitudS_string.get()) * math.pi / 180     # Initial angular displacement (rad)
-    theta2_ini_Simple = 0                                                 # Initial angular velocity (rad/s)
-    theta_ini_Simple = [theta1_ini_Simple, theta2_ini_Simple]
-    theta12_Simple = solve_ivp(sim_pen_eq, t_span, theta_ini_Simple, t_eval = t)
-    theta1_Simple = theta12_Simple.y[0,:]
-    theta2_Simple = theta12_Simple.y[1,:]
-    plt.plot(t,theta1_Simple,label='Angular Displacement (rad)')
-    plt.plot(t,theta2_Simple,label='Angular velocity (rad/s)')
-    plt.xlabel('Time(s)')
-    plt.ylabel('Angular Disp.(rad) and Angular Vel.(rad/s)')
-    plt.legend()
-    plt.show()    
+    angulo_inicial_S = float(amplitudS_string.get())        #angulo incial
+    theta0_S = np.radians(angulo_inicial_S)                 #grados a radianes
+    omega0_S = 0                                            #velocidad inicial
+    y0_S = (theta0_S, omega0_S) 
+    solucion_S = odeint(ecPenduloSimple,y0_S,t)
+    theta_S, omega_S = solucion_S.T
+    titulo = "Pendulo Simple"
     
-    
+    graficar(t,theta_S, omega_S, titulo)
     
     
 def penduloAmortiguado():
-    pass
+    angulo_inicial_A = float(amplitudA_string.get())        #angulo incial
+    theta0_A = np.radians(angulo_inicial_A)                 #grados a radianes
+    omega0_A = 0                                            #velocidad inicial
+    y0_A = (theta0_A, omega0_A) 
+    solucion_A = odeint(ecPenduloAmortiguado,y0_A,t)
+    theta_A, omega_A = solucion_A.T
+    titulo = "Pendulo Amortiguado"
+    
+    graficar(t,theta_A, omega_A, titulo)    
+
 
 def penduloForzadoAmortiguado():
-    pass
+    angulo_inicial_FA = float(amplitudFA_string.get())        #angulo incial
+    theta0_FA = np.radians(angulo_inicial_FA)                 #grados a radianes
+    omega0_FA = 0 
+    y0_FA = (theta0_FA, omega0_FA)
+    solucion_FA = odeint(ecPenduloForzadoAmortiguado,y0_FA,t)
+    theta_FA, omega_FA = solucion_FA.T
+    titulo = "Pendulo Forzado Amortiguado"
+    
+    graficar(t,theta_FA, omega_FA, titulo)
+    
 
 """
 ###################################################################################
 VARIABLES GLOBALES PARA LA SIMULACIÓN
 ###################################################################################
 """
-# Initial and end values
-st = 0                          # Start time (s)
-et = 30                         # End time (s)
-ts = 0.1                        # Time step (s)
-t_span = [st,et+ts]
-t = np.arange(st,et+ts,ts)
-sim_points = len(t)
-l = np.arange(0,sim_points,1)
+#Condiciones iniciales de tiempo
+   
+t0 = 0            #tiempo inicial
+tf = 15           #tiempo final 
+saltos = tf*25    #cantidad de pasos, 25 constante para buena visualizacion
+
+t = np.linspace(t0,tf, saltos)
 
 
 
 """
 ###################################################################################
-INTERFAZ
+INTERFAZ Y VARIABLES STRINGVAR
 ###################################################################################
 """
 
@@ -170,10 +275,10 @@ Entry(root, justify="center",textvariable=amortiguamientoFA_string).pack() #cons
 Label(root, text="Digite la masa (kg)",font=("Arial",10)).pack()
 Entry(root, justify="center",textvariable=masaFA_string).pack() #masa
 
-Label(root, text="Constante de amortiguamiento ",font=("Arial",10)).pack()
+Label(root, text="Amplitud fuerza externa (N)",font=("Arial",10)).pack()
 Entry(root, justify="center",textvariable=amplitudFuerzaFA_string).pack() #Amplitud de la fuerza externa
     
-Label(root, text="Digite la masa (kg)",font=("Arial",10)).pack()
+Label(root, text="Frecuencia fuerza externa (rad/s)",font=("Arial",10)).pack()
 Entry(root, justify="center",textvariable=frecuenciaFA_string).pack() #frecuencia de la fuerza externa 
 
 
