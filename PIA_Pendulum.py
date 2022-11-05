@@ -5,6 +5,7 @@ Created on Tue Oct 11 21:19:23 2022
 @author: mario
 """
 from tkinter import *
+from PIL import ImageTk, Image
 import math
 import numpy as np
 import scipy
@@ -35,9 +36,38 @@ def graficar(t,theta_Graficar, omega_Graficar, titulo):
     plt.xlabel("Tiempo (s)")
     plt.ylabel("Desp. Angular (rad) y Vel. Angular (rad/s)")
     plt.legend()
-    plt.show()
+#   plt.show()
+    grafica = "grafica_{}.jpg".format(titulo)
+    plt.savefig(grafica)
+    plt.close()
+    
+    if(grafica == "grafica_Pendulo Simple.jpg"):
+        root2 = Toplevel()
+        root2.title("Pendulo Simple") #titulo de programa
+        root2.geometry("500x300") #tamaño de la ventana
+        root2.resizable(0,0) #ventana no se puede modificar ancho ni largo
+        imagen2 = ImageTk.PhotoImage(Image.open(grafica))
+        Label(root2, image=imagen2).pack(side="top")
+        root2.mainloop()
+        
+    elif(grafica == "grafica_Pendulo Amortiguado.jpg"):
+        root3 = Toplevel()
+        root3.title("Pendulo Amortiguado") #titulo de programa
+        root3.geometry("500x300") #tamaño de la ventana
+        root3.resizable(0,0) #ventana no se puede modificar ancho ni largo
+        imagen3 = ImageTk.PhotoImage(Image.open(grafica))
+        Label(root3, image=imagen3).pack(side="top")
+        root3.mainloop()
 
-
+    elif(grafica == "grafica_Pendulo Forzado Amortiguado.jpg"):
+        root4 = Toplevel()
+        root4.title("Pendulo Amortiguado") #titulo de programa
+        root4.geometry("500x300") #tamaño de la ventana
+        root4.resizable(0,0) #ventana no se puede modificar ancho ni largo
+        imagen4 = ImageTk.PhotoImage(Image.open(grafica))
+        Label(root4, image=imagen4).pack(side="top")
+        root4.mainloop()
+    
 
 """
 ###################################################################################
@@ -220,7 +250,7 @@ frecuenciaFA_string = StringVar()
 
 Label(root, text="Pendulo Simple",font=("Arial",12)).pack()
 
-Label(root, text="Digite al amplitud (°)",font=("Arial",10)).pack()
+Label(root, text="Digite la amplitud (°)",font=("Arial",10)).pack()
 Entry(root, justify="center",textvariable=amplitudS_string).pack() #amplitud
     
 Label(root, text="Digite el largo (m)",font=("Arial",10)).pack()
@@ -237,7 +267,7 @@ Button(root,text="Simular", command= penduloSimple).pack(pady=5) #creando boton 
 
 Label(root, text="Pendulo Amortiguado",font=("Arial",12)).pack()
 
-Label(root, text="Digite al amplitud (°)",font=("Arial",10)).pack()
+Label(root, text="Digite la amplitud (°)",font=("Arial",10)).pack()
 Entry(root, justify="center",textvariable=amplitudA_string).pack() #amplitud
     
 Label(root, text="Digite el largo (m)",font=("Arial",10)).pack()
@@ -260,7 +290,7 @@ Button(root,text="Simular", command= penduloAmortiguado).pack(pady=5) #creando b
 
 Label(root, text="Pendulo Forzado Amortiguado",font=("Arial",12)).pack()
 
-Label(root, text="Digite al amplitud (°)",font=("Arial",10)).pack()
+Label(root, text="Digite la amplitud (°)",font=("Arial",10)).pack()
 Entry(root, justify="center",textvariable=amplitudFA_string).pack() #amplitud
     
 Label(root, text="Digite el largo (m)",font=("Arial",10)).pack()
