@@ -13,11 +13,6 @@ from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 import os
 
-"""
-Navegar hasta donde está la carpeta PIA_Pnedulum; Directorio de trabajo
-"""
-path = "D:/OneDrive/OneDrive - uanl.edu.mx/FACULTAD/9no semestre/Proyecto IMTC/PIA_Pendulum"
-
 
 """
 ###################################################################################
