@@ -14,11 +14,45 @@ import matplotlib.pyplot as plt
 import os
 
 """
+Navegar hasta donde está la carpeta PIA_Pnedulum; Directorio de trabajo
+"""
+path = "D:/OneDrive/OneDrive - uanl.edu.mx/FACULTAD/9no semestre/Proyecto IMTC/PIA_Pendulum"
+
+
+"""
 ###################################################################################
 FUNCION PARA SIMULAR
 ###################################################################################
 
 """
+
+def simular(titulo, theta_Simular, simulacion, L):
+    puntos_simulacion = len(t)
+    l_simulacion =np.arange(0,puntos_simulacion,1)
+
+    x_posicion = L*np.sin(theta_Simular)
+    y_posicion = -L*np.cos(theta_Simular)
+    
+    os.chdir(simulacion + '/') #cambia directorio de trabajo
+    
+    for punto in l_simulacion:
+         plt.figure()
+         plt.title(titulo)
+         plt.plot(x_posicion[punto],y_posicion[punto],'ro',markersize = 10) #Dibuja pendulo
+         plt.plot([0,x_posicion[punto]],[0,y_posicion[punto]])              #Dibuja cadena del pendulo
+         plt.xlim(-L-0.5,L+0.5)                                             #Limite de X
+         plt.ylim(-L-0.5,L+0.5)                                             #Limite de Y
+         plt.xlabel('Direccion X')
+         plt.ylabel('Direccion Y')
+         filenumber = punto
+         filenumber = format(filenumber,"05")
+         filename="image{}.png".format(filenumber)
+         plt.savefig(filename)
+         plt.close()
+    
+    os.system("ffmpeg -f image2 -r 20 -i image%05d.png -vcodec mpeg4 -y movie.avi")   
+
+    os.chdir('../') #Regresando a la direccion anterior de trabajo
 
 
 
@@ -48,6 +82,11 @@ def graficar(t,theta_Graficar, omega_Graficar, titulo):
         root2.resizable(0,0) #ventana no se puede modificar ancho ni largo
         imagen2 = ImageTk.PhotoImage(Image.open(grafica))
         Label(root2, image=imagen2).pack(side="top")
+    
+        simulacion = "Simulacion PS"
+        L_S = float(largoS_string.get())
+        simular(titulo, theta_Graficar, simulacion,L_S)
+        
         root2.mainloop()
         
     elif(grafica == "grafica_Pendulo Amortiguado.jpg"):
@@ -57,6 +96,11 @@ def graficar(t,theta_Graficar, omega_Graficar, titulo):
         root3.resizable(0,0) #ventana no se puede modificar ancho ni largo
         imagen3 = ImageTk.PhotoImage(Image.open(grafica))
         Label(root3, image=imagen3).pack(side="top")
+        
+        simulacion = "Simulacion PA"
+        L_A = float(largoA_string.get())
+        simular(titulo, theta_Graficar, simulacion,L_A)        
+        
         root3.mainloop()
 
     elif(grafica == "grafica_Pendulo Forzado Amortiguado.jpg"):
@@ -66,6 +110,11 @@ def graficar(t,theta_Graficar, omega_Graficar, titulo):
         root4.resizable(0,0) #ventana no se puede modificar ancho ni largo
         imagen4 = ImageTk.PhotoImage(Image.open(grafica))
         Label(root4, image=imagen4).pack(side="top")
+        
+        simulacion = "Simulacion PFA"
+        L_FA = float(largoFA_string.get())
+        simular(titulo, theta_Graficar, simulacion,L_FA)        
+        
         root4.mainloop()
     
 
@@ -203,7 +252,7 @@ VARIABLES GLOBALES PARA LA SIMULACIÓN
 #Condiciones iniciales de tiempo
    
 t0 = 0            #tiempo inicial
-tf = 15           #tiempo final 
+tf = 2           #tiempo final 
 saltos = tf*25    #cantidad de pasos, 25 constante para buena visualizacion
 
 t = np.linspace(t0,tf, saltos)

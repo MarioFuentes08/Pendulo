@@ -47,7 +47,7 @@ omega0 = 0                          #velocidad inicial
 y0 = (theta0, omega0)         
 
 t0 = 0            #tiempo inicial
-tf = 10           #tiempo final 
+tf = 3           #tiempo final 
 saltos = tf*25    #cantidad de pasos, 25 constante para buena visualizacion
 
 
@@ -73,6 +73,7 @@ l_simulacion =np.arange(0,puntos_simulacion,1)
 
 x_posicion = L*np.sin(theta)
 y_posicion = -L*np.cos(theta)
+
 
 
 for punto in l_simulacion:
