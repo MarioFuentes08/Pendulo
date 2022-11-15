@@ -12,7 +12,8 @@ import scipy
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 import os
-
+import threading as th
+import time
 
 """
 ###################################################################################
@@ -28,7 +29,14 @@ def simular(titulo, theta_Simular, simulacion, L):
     x_posicion = L*np.sin(theta_Simular)
     y_posicion = -L*np.cos(theta_Simular)
     
+    #Eliminando simulación anterior para no haya overlapping
+    dir = simulacion
+    for f in os.listdir(simulacion):
+        os.remove(os.path.join(dir,f))
+        
+        
     os.chdir(simulacion + '/') #cambia directorio de trabajo
+
     
     for punto in l_simulacion:
          plt.figure()
@@ -45,7 +53,19 @@ def simular(titulo, theta_Simular, simulacion, L):
          plt.savefig(filename)
          plt.close()
     
-    os.system("ffmpeg -f image2 -r 20 -i image%05d.png -vcodec mpeg4 -y movie.avi")   
+    if titulo == "Pendulo Simple":
+        os.system("ffmpeg -f image2 -r 20 -i image%05d.png -vcodec mpeg4 -y moviePS.avi")
+        movie = "moviePS.avi"
+        
+    elif titulo == "Pendulo Amortiguado":
+        os.system("ffmpeg -f image2 -r 20 -i image%05d.png -vcodec mpeg4 -y moviePA.avi")
+        movie = "moviePA.avi"
+        
+    elif titulo == "Pendulo Forzado Amortiguado":
+        os.system("ffmpeg -f image2 -r 20 -i image%05d.png -vcodec mpeg4 -y moviePFA.avi")
+        movie = "moviePFA.avi"
+        
+    os.startfile(movie) #mostrando video
 
     os.chdir('../') #Regresando a la direccion anterior de trabajo
 
@@ -203,7 +223,10 @@ FUNCIONES PARA LLAMAR
      dtheta1_dt is rate of change of angular displacement at current time instant i.e. same as theta2 
 """
 
+
+
 def penduloSimple():
+    esperar = 1
     angulo_inicial_S = float(amplitudS_string.get())        #angulo incial
     theta0_S = np.radians(angulo_inicial_S)                 #grados a radianes
     omega0_S = 0                                            #velocidad inicial
@@ -237,6 +260,21 @@ def penduloForzadoAmortiguado():
     titulo = "Pendulo Forzado Amortiguado"
     
     graficar(t,theta_FA, omega_FA, titulo)
+   
+"""
+def threadFunction():
+    global esperar
+    esperar = 0
+    while True:
+        if(esperar == 1):
+            print("hola")
+           # Label(root, text="Espere...",font=("Arial",10)).pack()
+        elif(esperar == 0):
+            pass
+            
+            
+        time.sleep(0.15)
+"""     
     
 
 """
@@ -247,11 +285,10 @@ VARIABLES GLOBALES PARA LA SIMULACIÓN
 #Condiciones iniciales de tiempo
    
 t0 = 0            #tiempo inicial
-tf = 2           #tiempo final 
+tf = 4           #tiempo final 
 saltos = tf*25    #cantidad de pasos, 25 constante para buena visualizacion
 
 t = np.linspace(t0,tf, saltos)
-
 
 
 """
@@ -259,6 +296,8 @@ t = np.linspace(t0,tf, saltos)
 INTERFAZ Y VARIABLES STRINGVAR
 ###################################################################################
 """
+#hilo = th.Thread(target = threadFunction)
+#hilo.start()
 
 root = Tk()
 root.title("El pendulo") #titulo de programa
@@ -271,6 +310,7 @@ root.resizable(0,0) #venta no se puede modificar ancho ni largo
 amplitudS_string = StringVar()
 largoS_string = StringVar()
 gravedadS_string = StringVar()
+
 
 """ Pendulo amortiguado variables"""
 amplitudA_string = StringVar()
@@ -292,15 +332,15 @@ frecuenciaFA_string = StringVar()
 
 """PENDULO SIMPLE"""
 
-Label(root, text="Pendulo Simple",font=("Arial",12)).pack()
+Label(root, text="Pendulo Simple",font=("Arial",10)).pack()
 
-Label(root, text="Digite la amplitud (°)",font=("Arial",10)).pack()
+Label(root, text="Digite la amplitud (°)",font=("Arial",8)).pack()
 Entry(root, justify="center",textvariable=amplitudS_string).pack() #amplitud
     
-Label(root, text="Digite el largo (m)",font=("Arial",10)).pack()
+Label(root, text="Digite el largo (m)",font=("Arial",8)).pack()
 Entry(root, justify="center",textvariable=largoS_string).pack() #largo
     
-Label(root, text="Digite la aceleracion de la gravedad (m/s^2)",font=("Arial",10)).pack()
+Label(root, text="Digite la aceleracion de la gravedad (m/s^2)",font=("Arial",8)).pack()
 Entry(root, justify="center",textvariable=gravedadS_string).pack() #largo 
     
 Button(root,text="Simular", command= penduloSimple).pack(pady=5) #creando boton dentro de raiz 
@@ -309,21 +349,21 @@ Button(root,text="Simular", command= penduloSimple).pack(pady=5) #creando boton 
 
 """PENDULO AMORTIGUADO"""
 
-Label(root, text="Pendulo Amortiguado",font=("Arial",12)).pack()
+Label(root, text="Pendulo Amortiguado",font=("Arial",10)).pack()
 
-Label(root, text="Digite la amplitud (°)",font=("Arial",10)).pack()
+Label(root, text="Digite la amplitud (°)",font=("Arial",8)).pack()
 Entry(root, justify="center",textvariable=amplitudA_string).pack() #amplitud
     
-Label(root, text="Digite el largo (m)",font=("Arial",10)).pack()
+Label(root, text="Digite el largo (m)",font=("Arial",8)).pack()
 Entry(root, justify="center",textvariable=largoA_string).pack() #largo
     
-Label(root, text="Digite la aceleracion de la gravedad (m/s^2)",font=("Arial",10)).pack()
+Label(root, text="Digite la aceleracion de la gravedad (m/s^2)",font=("Arial",8)).pack()
 Entry(root, justify="center",textvariable=gravedadA_string).pack() #gravedad 
 
-Label(root, text="Constante de amortiguamiento ",font=("Arial",10)).pack()
+Label(root, text="Constante de amortiguamiento ",font=("Arial",8)).pack()
 Entry(root, justify="center",textvariable=amortiguamientoA_string).pack() #constante amortiguamiento
     
-Label(root, text="Digite la masa (kg)",font=("Arial",10)).pack()
+Label(root, text="Digite la masa (kg)",font=("Arial",8)).pack()
 Entry(root, justify="center",textvariable=masaA_string).pack() #masa 
   
 Button(root,text="Simular", command= penduloAmortiguado).pack(pady=5) #creando boton dentro de raiz
@@ -332,32 +372,30 @@ Button(root,text="Simular", command= penduloAmortiguado).pack(pady=5) #creando b
  
 """PENDULO FORZADO AMORTIGUADO"""
 
-Label(root, text="Pendulo Forzado Amortiguado",font=("Arial",12)).pack()
+Label(root, text="Pendulo Forzado Amortiguado",font=("Arial",10)).pack()
 
-Label(root, text="Digite la amplitud (°)",font=("Arial",10)).pack()
+Label(root, text="Digite la amplitud (°)",font=("Arial",8)).pack()
 Entry(root, justify="center",textvariable=amplitudFA_string).pack() #amplitud
     
-Label(root, text="Digite el largo (m)",font=("Arial",10)).pack()
+Label(root, text="Digite el largo (m)",font=("Arial",8)).pack()
 Entry(root, justify="center",textvariable=largoFA_string).pack() #largo
     
-Label(root, text="Digite la aceleracion de la gravedad (m/s^2)",font=("Arial",10)).pack()
+Label(root, text="Digite la aceleracion de la gravedad (m/s^2)",font=("Arial",8)).pack()
 Entry(root, justify="center",textvariable=gravedadFA_string).pack() #gravedad 
 
-Label(root, text="Constante de amortiguamiento ",font=("Arial",10)).pack()
+Label(root, text="Constante de amortiguamiento ",font=("Arial",8)).pack()
 Entry(root, justify="center",textvariable=amortiguamientoFA_string).pack() #constante amortiguamiento
     
-Label(root, text="Digite la masa (kg)",font=("Arial",10)).pack()
+Label(root, text="Digite la masa (kg)",font=("Arial",8)).pack()
 Entry(root, justify="center",textvariable=masaFA_string).pack() #masa
 
-Label(root, text="Amplitud fuerza externa (N)",font=("Arial",10)).pack()
+Label(root, text="Amplitud fuerza externa (N)",font=("Arial",8)).pack()
 Entry(root, justify="center",textvariable=amplitudFuerzaFA_string).pack() #Amplitud de la fuerza externa
     
-Label(root, text="Frecuencia fuerza externa (rad/s)",font=("Arial",10)).pack()
+Label(root, text="Frecuencia fuerza externa (rad/s)",font=("Arial",8)).pack()
 Entry(root, justify="center",textvariable=frecuenciaFA_string).pack() #frecuencia de la fuerza externa 
-
-
-Button(root,text="Simular", command= penduloForzadoAmortiguado).pack(pady=5) #creando boton dentro de raiz 
-
-
-
+Button(root,text="Simular", command= penduloForzadoAmortiguado).pack(pady=5) #creando boton dentro de raiz
+ 
 root.mainloop()
+
+
