@@ -12,7 +12,6 @@ import scipy
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 import os
-import threading as th
 import time
 
 """
@@ -260,23 +259,10 @@ def penduloForzadoAmortiguado():
     titulo = "Pendulo Forzado Amortiguado"
     
     graficar(t,theta_FA, omega_FA, titulo)
-   
-"""
-def threadFunction():
-    global esperar
-    esperar = 0
-    while True:
-        if(esperar == 1):
-            print("hola")
-           # Label(root, text="Espere...",font=("Arial",10)).pack()
-        elif(esperar == 0):
-            pass
-            
-            
-        time.sleep(0.15)
-"""     
     
-
+       
+   
+ 
 """
 ###################################################################################
 VARIABLES GLOBALES PARA LA SIMULACIÓN
@@ -296,8 +282,7 @@ t = np.linspace(t0,tf, saltos)
 INTERFAZ Y VARIABLES STRINGVAR
 ###################################################################################
 """
-#hilo = th.Thread(target = threadFunction)
-#hilo.start()
+
 
 root = Tk()
 root.title("El pendulo") #titulo de programa
