@@ -752,7 +752,7 @@ root = Tk()
 root.configure(bg='lightblue')
 root.title("El pendulo") #titulo de programa
 root.iconbitmap('pendulo.ico') #icono de programa
-root.geometry("820x450") #tamaño de la ventana
+root.geometry("820x500") #tamaño de la ventana
 root.resizable(0,0) #venta no se puede modificar ancho ni largo
 
 
