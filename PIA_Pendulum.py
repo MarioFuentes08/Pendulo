@@ -22,6 +22,11 @@ FUNCION PARA SIMULAR
 """
 
 def simular(titulo, theta_Simular, simulacion, L):
+    
+    
+    status.set("Cargando simulación...")
+    frame3.update_idletasks() 
+    
     puntos_simulacion = len(t)
     l_simulacion =np.arange(0,puntos_simulacion,1)
 
@@ -98,9 +103,12 @@ def simular(titulo, theta_Simular, simulacion, L):
 
     elif titulo == "Pendulo Forzado Amortiguado Test 3":
         os.system("ffmpeg -f image2 -r 20 -i image%05d.png -vcodec mpeg4 -y movieTest3PFA.avi")
-        movie = "movieTest3PFA.avi"        
-    os.startfile(movie) #mostrando video
+        movie = "movieTest3PFA.avi"   
 
+    status.set("¡Listo!")
+    frame3.update_idletasks()        
+        
+    os.startfile(movie) #mostrando video
     os.chdir('../') #Regresando a la direccion anterior de trabajo
 
 
@@ -130,7 +138,7 @@ def graficar(t,theta_Graficar, omega_Graficar, titulo):
         root2.resizable(0,0) #ventana no se puede modificar ancho ni largo
         imagen2 = ImageTk.PhotoImage(Image.open(grafica))
         Label(root2, image=imagen2).pack(side="top")
-    
+           
         simulacion = "Simulacion PS"
         L_S = float(largoS_string.get())
         simular(titulo, theta_Graficar, simulacion,L_S)
@@ -221,7 +229,7 @@ def graficarTest(t,theta_Graficar1,theta_Graficar2,theta_Graficar3, omega_Grafic
         Label(root5, image=imagenS2).pack(side = "left") 
         
         imagenS3 = ImageTk.PhotoImage(Image.open(grafica3))
-        Label(root5, image=imagenS3).pack(side = "left")
+        Label(root5, image=imagenS3).pack(side = "left")        
         
         """Simulacion Test 1 PS"""
         simulacion1 = "Simulacion Test 1 PS"
@@ -444,6 +452,8 @@ FUNCIONES PARA LLAMAR
 
 
 def penduloSimple():
+    actualizarTiempo()
+    
     angulo_inicial_S = float(amplitudS_string.get())        #angulo incial
     theta0_S = np.radians(angulo_inicial_S)                 #grados a radianes
     omega0_S = 0                                            #velocidad inicial
@@ -456,6 +466,8 @@ def penduloSimple():
     
     
 def penduloAmortiguado():
+    actualizarTiempo()
+    
     angulo_inicial_A = float(amplitudA_string.get())        #angulo incial
     theta0_A = np.radians(angulo_inicial_A)                 #grados a radianes
     omega0_A = 0                                            #velocidad inicial
@@ -468,6 +480,8 @@ def penduloAmortiguado():
 
 
 def penduloForzadoAmortiguado():
+    actualizarTiempo()
+    
     angulo_inicial_FA = float(amplitudFA_string.get())        #angulo incial
     theta0_FA = np.radians(angulo_inicial_FA)                 #grados a radianes
     omega0_FA = 0 
@@ -480,11 +494,11 @@ def penduloForzadoAmortiguado():
     
     
 def testS():
+    actualizarTiempo()
     
-
     global gravedadS_Test
     gravedadS_Test = 9.8
-    
+  
     global countS
     countS = 1
     """Caso 1"""
@@ -533,10 +547,12 @@ def testS():
     
     graficarTest(t,theta_S1,theta_S2,theta_S3, omega_S1,omega_S2,omega_S3, titulo1,titulo2,titulo3,"S")
     
+
+    
     
 def testA():
+    actualizarTiempo()
     
-
     global gravedadA_Test
     gravedadA_Test = 9.8
    
@@ -607,6 +623,7 @@ def testA():
     graficarTest(t,theta_A1,theta_A2,theta_A3, omega_A1,omega_A2,omega_A3, titulo1,titulo2,titulo3,"A")
 
 def testFA():
+    actualizarTiempo()
     
     global gravedadFA_Test
     gravedadFA_Test = 9.8  
@@ -705,14 +722,22 @@ VARIABLES GLOBALES PARA LA SIMULACIÓN
 ###################################################################################
 """
 #Condiciones iniciales de tiempo
+def actualizarTiempo():
+    
+    global t
+    
+    t0 = 0                                   #tiempo inicial
+    if len(tSimulacion.get()) == 0:          #Si la entrada está vacia
+        tf = 5                                      #default 5 seg 
+        saltos = tf*25                              #cantidad de pasos, 25 constante para buena visualizacion                          
+                          
+    else:                                           #Si el usuario digitó un tiempo
+        tf = int(tSimulacion.get())               #tiempo final 
+        saltos = tf*25                              #cantidad de pasos, 25 constante para buena visualizacion
+
+    t = np.linspace(t0,tf, saltos)
    
-t0 = 0            #tiempo inicial
-tf = 15           #tiempo final 
-saltos = tf*25    #cantidad de pasos, 25 constante para buena visualizacion
 
-t = np.linspace(t0,tf, saltos)
-
-global status
 
 
 
@@ -730,6 +755,8 @@ root.iconbitmap('pendulo.ico') #icono de programa
 root.geometry("820x450") #tamaño de la ventana
 root.resizable(0,0) #venta no se puede modificar ancho ni largo
 
+
+status = StringVar()
 
 """ Pendulo simple variables"""
 amplitudS_string = StringVar()
@@ -754,7 +781,14 @@ masaFA_string = StringVar()
 amplitudFuerzaFA_string = StringVar()
 frecuenciaFA_string = StringVar()
 
+"""Tiempo de simulacion"""
+tSimulacion = StringVar()
+
 Label(root, bg = "lightblue", text="Simulación de un péndulo",font=("Arial",15)).pack(padx = 10, pady = 10, side = "top")
+Label(root, bg = "lightblue", text="Digite el tiempo de simulación (s): ",font=("Arial",8)).pack(padx = 10, pady = 10, side = "top")
+Entry(root, justify="center",textvariable=tSimulacion).pack()
+
+
 
 """PENDULO SIMPLE"""
 
@@ -844,6 +878,8 @@ Button(frame4,text="Test 3 Péndulo Forzado Amortiguado", command= testFA).pack(
 
 frame4.pack(padx = 5, pady = 5, side = "left")
 
+"""STATUS"""
+status.set("")
+Label(frame3, bg = "lightblue", textvariable = status, font=("Arial",12)).pack(padx = 10, pady = 10, side = "left")
+
 root.mainloop()
-
-
